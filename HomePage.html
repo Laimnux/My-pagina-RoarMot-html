@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home MYMoto</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Fuente personalizada -->
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    .font-bebas {
+      font-family: 'Bebas Neue', sans-serif;
+    }
+    /* Animación personalizada para el pulso */
+    @keyframes customPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    .animate-custom-pulse {
+      animation: customPulse 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-cover bg-center" 
+      style="background-image: url('./assets/fondoPagina.jpg'); background-blend-mode: overlay; background-color: rgba(0, 0, 0, 0.3);">
+
+  <!-- ==================== -->
+  <!-- MENÚ SUPERIOR (NUEVO) -->
+  <!-- ==================== -->
+  <header class="bg-[#101010] text-white sticky top-0 z-50 shadow-xl">
+    <div class="container mx-auto px-4 py-3">
+      <div class="flex items-center justify-between">
+
+        <!--logos de la marca-->
+        <div class="flex items-center">
+          <!-- Logo con tamaño vw (viewport-width) -->
+          <img src="./assets/logo.png" alt="Logo" 
+               class="w-[45px] min-w-[45px] md:w-[40px] lg:w-[50px] 
+                      h-auto aspect-square
+                      hidden sm:block">
+          
+          <!-- Texto con ancho flexible -->
+          <img src="./assets/textoLogo.png" alt="Texto" 
+               class="w-auto h-[20px] md:h-[25px] lg:h-[30px] 
+                      ml-1 md:ml-2
+                      max-w-[180px]">
+        </div>
+        
+        <!-- Menú central - Ajusta los enlaces según necesites -->
+        <nav class="hidden md:flex space-x-8">
+          <a href="#" class="text-sm hover:text-red-400 transition-colors font-medium
+          flex items-center justify-center h-full px-3 py-2
+          border-b-2 border-transparent hover:border-orange-400">Tienda</a>
+          <a href="#" class="text-sm hover:text-red-400 transition-colors font-medium
+          flex items-center justify-center h-full px-3 py-2
+          border-b-2 border-transparent hover:border-orange-400">CDA</a>
+          <a href="#" class="text-sm hover:text-red-400 transition-colors font-medium
+          flex items-center justify-center h-full px-3 py-2
+          border-b-2 border-transparent hover:border-orange-400">Alertas</a>
+          <a href="#" class="text-sm hover:text-red-400 transition-colors font-medium
+          flex items-center justify-center h-full px-3 py-2
+          border-b-2 border-transparent hover:border-orange-400">SOS</a>
+        </nav>
+        
+        <!-- Sección usuario - Cambia el nombre por el de tu usuario -->
+        <div class="flex items-center space-x-6">
+        
+          <!-- Botones de acción Y de registro menu-->
+          <div class="flex space-x-4">
+            <a href="InicioSesionPage.html" 
+                class="text-sm hover:text-red-400 transition-all duration-300 font-medium
+                      flex items-center justify-center h-full px-3 py-2
+                      border-b-2 border-transparent hover:border-orange-400
+                      group relative overflow-hidden">
+              
+              <!-- Texto visible -->
+              <span class="relative z-10">Iniciar sesión</span>
+              
+              <!-- Efecto de fondo animado para el boton inicio de sesion -->
+              <span class="absolute inset-0 bg-orange-000 opacity-0 
+                          group-hover:opacity-10 transition-opacity duration-500"></span>
+            </a>
+
+            <a href="#" class="bg-red-600 hover:bg-[#fd8c00] text-white 
+                  px-4 py-2 rounded-lg 
+                  font-bold tracking-wide
+                  transition-all duration-150 
+                  transform hover:scale-110 
+                  shadow-lg hover:shadow-xl
+                  hover:brightness-110">
+                  REGÍSTRATE
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== -->
+  <!-- CONTENIDO PRINCIPAL (EXISTENTE) -->
+  <!-- ==================== -->
+  <main class="flex-grow flex items-center justify-end">
+    <div class="container mx-auto px-4 py-12 text-white mr-8 md:mr-16 lg:mr-24">
+      <div class="max-w-md text-left">
+        
+        <!-- Título principal -->
+        <h1 class="font-bebas text-5xl md:text-6xl mb-4 tracking-wider">
+          TU MOTO, TU CONTROL
+        </h1>
+        
+        <!-- Lema con efecto gradiente -->
+        <p class="font-[Arial_Black] text-3xl md:text-4xl 
+        uppercase bg-clip-text text-transparent 
+        bg-gradient-to-r from-red-500 to-yellow-500 
+        drop-shadow-[0_0_8px_#ff000080] mb-6">
+          ACCEDE Y GESTIONA
+          TODO DESDE LA PALMA DE TU MANO.
+        </p>
+        
+        <!-- Descripción -->
+        <p class="text-lg md:text-xl mb-6 mt-2 text-gray-300 font-medium leading-relaxed italic">
+          Controla y gestiona tu moto de forma remota en tu dispositivo movil descargando nuestra app.
+        </p>
+        
+        <!-- Botón de Registro principal -->
+        <a href="#" class="inline-block 
+          text-3xl md:text-4xl font-bebas 
+          px-12 md:px-16 py-4 md:py-6 
+          bg-red-600 hover:bg-[#fd8c00] 
+          text-white 
+          rounded 
+          tracking-widest
+          transition-all duration-150 
+          transform scale-90 hover:scale-100
+          hover:brightness-120
+          border-2 border-transparent">
+          REGÍSTRATE
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== -->
+  <!-- ESLOGAN INFERIOR (EXISTENTE) -->
+  <!-- ==================== -->
+  <footer class="fixed bottom-10 left-0 right-0 text-center z-40">
+    <div class="group inline-block">
+      <p class="text-3xl italic font-bold relative 
+                bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-red-500
+                [text-shadow:_0_0_30px_#ff0000,0_0_10px_#ff00000]
+                animate-custom-pulse hover:animate-none">
+        
+        "MOTERO AYUDA MOTERO"
+        
+        <!-- Efectos de subrayado -->
+        <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-yellow-500 
+                    group-hover:w-full transition-all duration-300"></span>
+        <span class="absolute inset-5 bg-yellow-500 opacity-0 
+                    group-hover:opacity-10 group-hover:scale-110 
+                    transition-all duration-200 blur-sm"></span>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ===== SECCIÓN APP ===== -->
+<!-- Agrega ESTE BLOQUE donde quieras en tu <main> (recomiendo después del primer grid) -->
+<section class="py-12 bg-gradient-to-b from-[#151921] to-gray-900">
+  <div class="container mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
+    
+    <!-- Contenedor de texto (izquierda) -->
+    <div class="md:w-1/2 space-y-6 text-center md:text-left">
+      <h2 class="text-3xl md:text-4xl font-bold text-white">
+        Descarga nuestra <span class="text-yellow-500">app</span>
+      </h2>
+      <p class="text-gray-300 text-lg">
+        Controla tu moto desde cualquier lugar y accede a funciones exclusivas.
+      </p>
+      
+      <!-- Botones descarga -->
+      <div class="flex flex-wrap justify-center md:justify-start gap-4">
+        <a href="#" class="inline-flex items-center bg-black hover:bg-gray-800 px-6 py-3 rounded-lg transition">
+          <img src="assets/icons/app-store.png" alt="App Store" class="h-10">
+        </a>
+        <a href="#" class="inline-flex items-center bg-black hover:bg-gray-800 px-6 py-3 rounded-lg transition">
+          <img src="assets/icons/play-store.png" alt="Play Store" class="h-10">
+        </a>
+      </div>
+      
+      <!-- Características (opcional) -->
+      <ul class="grid grid-cols-2 gap-2 text-gray-300 text-sm md:text-base">
+        <li class="flex items-center gap-2">
+          <span class="text-yellow-500">✓</span> Monitoreo en tiempo real
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-yellow-500">✓</span> Historial de viajes
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-yellow-500">✓</span> Alertas personalizadas
+        </li>
+        <li class="flex items-center gap-2">
+          <span class="text-yellow-500">✓</span> Soporte 24/7
+        </li>
+      </ul>
+    </div>
+    
+    <!-- Dispositivo móvil (derecha) -->
+    <div class="md:w-1/2 flex justify-center relative">
+      <!-- Base del teléfono (reemplaza con tu imagen) -->
+      <div class="relative w-64 h-auto">
+        <img src="assets/mockup-phone.png" alt="App MMOTO" class="w-full h-auto">
+        
+        <!-- Pantalla de la app (opcional) -->
+        <div class="absolute inset-0 flex items-center justify-center p-3">
+          <img src="assets/app-screenshot.png" alt="Pantalla app" class="rounded-lg w-full h-auto">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

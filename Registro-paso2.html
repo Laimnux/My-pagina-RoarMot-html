@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validación de Código | MYMOTO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    .font-bebas { font-family: 'Bebas Neue', sans-serif; }
+    .bg-cream { background-color: #FBF9F7; }
+    .input-error { border-color: #ef4444 !important; }
+    .error-message { color: #ef4444; font-size: 0.75rem; margin-top: 0.25rem; }
+    .code-input { letter-spacing: 0.5rem; }
+    .code-input.error {
+      border-color: #ef4444 !important;
+      animation: shake 0.5s;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body class="bg-cream min-h-screen flex relative">
+
+  <!-- Alerta emergente -->
+  <div id="alerta" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full">
+    <span id="mensaje-alerta"></span>
+  </div>
+
+  <!-- Columna izquierda - Formulario -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+    <div class="max-w-md w-full">
+      
+      <!-- Logo -->
+      <div class="bg-white p-4 rounded-xl shadow-sm mb-10">
+        <div class="flex items-center justify-center space-x-1">
+          <img src="./assets/Logo-RoarMot-Negro.png" alt="Logo MMOTO" class="h-16 w-auto object-contain">
+          <img src="./assets/tipografia-roarmot-negro.png" alt="Texto MMOTO" class="h-10 w-auto object-contain">
+        </div>
+      </div>
+
+      <!-- Formulario - PASO 2 -->
+      <div class="bg-white p-10 rounded-xl shadow-sm">
+        <h1 class="font-bebas text-4xl text-gray-800 text-center mb-2">VALIDA TU CÓDIGO</h1>
+        <p class="text-gray-600 text-center mb-8">Hemos enviado un código de 6 dígitos a<br><span id="email-mostrado" class="font-semibold">usuario@ejemplo.com</span></p>
+        
+        <form class="mt-8 space-y-6" id="formularioPaso2">
+
+          <!-- Inputs de código -->
+          <div class="flex justify-center space-x-3 mb-8">
+            <input type="text" maxlength="1" class="w-12 h-16 text-3xl text-center border-2 border-gray-300 rounded-md focus:border-[#fd8c00] focus:outline-none code-input" 
+                   oninput="moveToNext(this, 1)" onkeydown="moveToPrevious(event, this, 1)">
+            <input type="text" maxlength="1" class="w-12 h-16 text-3xl text-center border-2 border-gray-300 rounded-md focus:border-[#fd8c00] focus:outline-none code-input"
+                   oninput="moveToNext(this, 2)" onkeydown="moveToPrevious(event, this, 2)">
+            <input type="text" maxlength="1" class="w-12 h-16 text-3xl text-center border-2 border-gray-300 rounded-md focus:border-[#fd8c00] focus:outline-none code-input"
+                   oninput="moveToNext(this, 3)" onkeydown="moveToPrevious(event, this, 3)">
+            <input type="text" maxlength="1" class="w-12 h-16 text-3xl text-center border-2 border-gray-300 rounded-md focus:border-[#fd8c00] focus:outline-none code-input"
+                   oninput="moveToNext(this, 4)" onkeydown="moveToPrevious(event, this, 4)">
+            <input type="text" maxlength="1" class="w-12 h-16 text-3xl text-center border-2 border-gray-300 rounded-md focus:border-[#fd8c00] focus:outline-none code-input"
+                   oninput="moveToNext(this, 5)" onkeydown="moveToPrevious(event, this, 5)">
+            <input type="text" maxlength="1" class="w-12 h-16 text-3xl text-center border-2 border-gray-300 rounded-md focus:border-[#fd8c00] focus:outline-none code-input"
+                   onkeydown="moveToPrevious(event, this, 6)">
+          </div>
+
+          <!-- Botón Validar -->
+          <button type="submit" 
+                  class="w-full bg-red-600 hover:bg-[#fd8c00] text-white 
+                         py-4 px-6 rounded-md font-bebas text-2xl 
+                         transition-all duration-300 transform hover:scale-[1.02]
+                         shadow-lg hover:shadow-xl">
+            VALIDAR CÓDIGO
+          </button>
+
+          <!-- Reenviar código -->
+          <div class="text-center mt-6">
+            <p class="text-gray-600 text-sm">
+              ¿No recibiste el código? 
+              <button type="button" onclick="reenviarCodigo()" class="text-[#fd8c00] hover:underline focus:outline-none">
+                Reenviar código
+              </button>
+            </p>
+            <div id="tiempo-restante" class="text-gray-500 text-sm mt-1">Podrás reenviar en <span id="contador">60</span> segundos</div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Columna derecha - Imagen -->
+  <div class="hidden lg:block w-1/2 relative">
+    <div class="absolute inset-0 flex items-center justify-center p-2">
+      <div class="relative w-full h-full rounded-xl overflow-hidden shadow-lg">
+        <img id="dynamic-bg-image" src="./assets/Motero.jpg" alt="Moto MMOTO" 
+            class="absolute h-full w-auto max-w-none transition-all duration-300">
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // Mostrar email de la URL y obtener el rol
+  const urlParams = new URLSearchParams(window.location.search);
+  const email = urlParams.get('email');
+  const rol = urlParams.get('rol'); // ¡Obtenemos el rol aquí!
+
+  document.getElementById('email-mostrado').textContent = email || 'usuario@ejemplo.com';
+
+   // Lógica para cambiar la imagen de fondo según el rol
+  const dynamicBgImage = document.getElementById('dynamic-bg-image'); 
+
+  if (dynamicBgImage) {
+    if (rol === 'vendedor') { 
+      dynamicBgImage.src = './assets/proveedor.jpg';
+      dynamicBgImage.alt = 'Proveedor MYMOTO';
+      // Asegurar que la imagen del vendedor esté posicionada correctamente
+      dynamicBgImage.classList.add('right-[-40%]'); // Posiciona la imagen del proveedor a la derecha
+      dynamicBgImage.classList.remove('left-[-15%]'); // Asegura que no tenga la posición de motero
+    } else { // Si el rol es 'comprador' o por defecto
+      dynamicBgImage.src = './assets/Motero.jpg';
+      dynamicBgImage.alt = 'Moto MYMOTO';
+      // Asegurar que la imagen del motero esté posicionada correctamente
+      dynamicBgImage.classList.add('left-[-15%]'); // Posiciona la imagen del motero a la izquierda
+      dynamicBgImage.classList.remove('right-[-40%]'); // Asegura que no tenga la posición de proveedor
+    }
+  }
+
+
+  // Lógica para moverse entre inputs
+  function moveToNext(input, nextIndex) {
+    if (input.value.length === 1) {
+      const nextInput = document.querySelector(`.code-input:nth-child(${nextIndex + 1})`);
+      if (nextInput) nextInput.focus();
+    }
+  }
+
+  function moveToPrevious(event, input, currentIndex) {
+    if (event.key === 'Backspace' && input.value.length === 0) {
+      const prevInput = document.querySelector(`.code-input:nth-child(${currentIndex - 1})`);
+      if (prevInput) prevInput.focus();
+    }
+  }
+
+  // Temporizador para reenviar código
+  let tiempo = 60;
+  let intervalo; // Declara intervalo aquí para que sea accesible en reenviarCodigo
+
+  // Iniciar el contador al cargar la página si no está ya en 0
+  document.addEventListener('DOMContentLoaded', function() {
+    if (tiempo > 0) {
+        document.getElementById('tiempo-restante').classList.remove('hidden');
+        intervalo = setInterval(() => {
+            tiempo--;
+            document.getElementById('contador').textContent = tiempo;
+            if (tiempo <= 0) {
+                clearInterval(intervalo);
+                document.getElementById('tiempo-restante').classList.add('hidden');
+            }
+        }, 1000);
+    } else {
+        document.getElementById('tiempo-restante').classList.add('hidden'); // Ocultar si ya es 0
+    }
+  });
+
+
+  function reenviarCodigo() {
+    if (tiempo > 0) return; // Evita reenviar si el contador no ha terminado
+    
+    // Aquí puedes generar un código real o simular el envío
+    const nuevoCodigo = Math.floor(100000 + Math.random() * 900000);
+    localStorage.setItem('codigoTemporal', nuevoCodigo); // Guarda el código para validación
+
+    const alerta = document.getElementById('alerta');
+    alerta.textContent = `Simulación: Nuevo código enviado a ${email} (${nuevoCodigo})`;
+    alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-blue-600';
+    alerta.classList.remove('hidden');
+    
+    // Reiniciar contador
+    tiempo = 60;
+    document.getElementById('contador').textContent = tiempo;
+    document.getElementById('tiempo-restante').classList.remove('hidden');
+    if (intervalo) clearInterval(intervalo); // Limpiar el intervalo anterior
+    intervalo = setInterval(() => {
+      tiempo--;
+      document.getElementById('contador').textContent = tiempo;
+      if (tiempo <= 0) clearInterval(intervalo);
+    }, 1000);
+  }
+
+  // Validación del formulario
+  document.getElementById('formularioPaso2').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let codigoIngresado = '';
+    document.querySelectorAll('.code-input').forEach(input => {
+      codigoIngresado += input.value;
+    });
+
+    const codigoCorrecto = localStorage.getItem('codigoTemporal') || '123456'; // Usa el código temporal o un default para pruebas
+    
+    const alerta = document.getElementById('alerta');
+
+    if (codigoIngresado === codigoCorrecto) {
+      alerta.textContent = '¡Código válido! Redirigiendo...';
+      alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-green-600';
+      alerta.classList.remove('hidden');
+      
+      setTimeout(() => {
+        // Redirigir al paso 3, pasando el email y el rol
+        window.location.href = `registro-paso3.html?email=${encodeURIComponent(email)}&rol=${encodeURIComponent(rol)}`;
+      }, 2000);
+    } else {
+      // Agrega clase 'error' a los inputs y la remueve después de la animación
+      document.querySelectorAll('.code-input').forEach(input => {
+        input.classList.add('error');
+        setTimeout(() => {
+          input.classList.remove('error');
+        }, 1000); // Remueve la clase 'error' después de 1 segundo (duración de la animación)
+      });
+      alerta.textContent = 'Código incorrecto. Intenta nuevamente.';
+      alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-red-600';
+      alerta.classList.remove('hidden');
+    }
+  });
+</script>
+</body>
+</html>

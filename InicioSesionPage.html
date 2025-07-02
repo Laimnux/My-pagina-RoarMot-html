@@ -1,24 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iniciar sesión | MYMOTO</title>
+  <!-- Configuración básica del documento -->
+  <meta charset="UTF-8"> <!-- Codificación de caracteres UTF-8 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport para responsive design -->
+  <title>Iniciar sesión | MYMOTO</title> <!-- Título de la página -->
+  
+  <!-- Incluir Tailwind CSS desde CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Importar fuente Bebas Neue de Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  
+  <!-- Estilos CSS personalizados -->
   <style>
+    /* Clase para aplicar la fuente Bebas Neue */
     .font-bebas { font-family: 'Bebas Neue', sans-serif; }
+    
+    /* Color de fondo personalizado */
     .bg-cream { background-color: #FBF9F7; }
+
+    /* Animación de vibración para inputs con error */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    /* Clase para aplicar la animación shake */
+    .shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+    }
   </style>
 </head>
 <body class="bg-cream min-h-screen flex relative">
-
-  <!-- Alerta emergente -->
+  <!-- Contenedor de alerta flotante (oculto inicialmente) -->
   <div id="alerta" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full">
     <span id="mensaje-alerta"></span>
   </div>
 
-  <!-- Columna izquierda - Imagen -->
+  <!-- Sección de imagen (solo visible en pantallas grandes) -->
   <div class="hidden lg:block w-1/2 relative overflow-hidden">
     <div class="absolute inset-0 flex items-center justify-center">
       <img src="./assets/imgRegistro.jpg" alt="Moto MMOTO" 
@@ -26,11 +49,11 @@
     </div>
   </div>
 
-  <!-- Columna derecha - Formulario -->
+  <!-- Sección del formulario -->
   <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
     <div class="max-w-md w-full">
       
-      <!-- Logo -->
+      <!-- Encabezado con logo -->
       <div class="bg-white p-4 rounded-xl shadow-sm mb-10">
         <div class="flex items-center justify-center space-x-1">
           <img src="./assets/Logo-RoarMot-Negro.png" alt="Logo MMOTO" class="h-16 w-auto object-contain">
@@ -38,74 +61,89 @@
         </div>
       </div>
 
-      <!-- Formulario -->
+      <!-- Contenedor principal del formulario -->
       <div class="bg-white p-10 rounded-xl shadow-sm">
         <h1 class="font-bebas text-4xl text-gray-800 text-center mb-2">INICIA SESIÓN</h1>
         
-        <form class="mt-8 space-y-6">
-
-          <!-- Email -->
+        <!-- Formulario de inicio de sesión -->
+        <form class="mt-8 space-y-6" id="loginForm">
+          
+          <!-- Campo de correo electrónico -->
           <div class="relative">
             <input 
               type="email" 
               id="email" 
               required 
               autocomplete="email"
-              placeholder="Ingresa tu correo"
-              class="peer w-full px-4 pt-6 pb-2 border border-gray-200 rounded-md
-                     bg-gray-50 focus:outline-none focus:border-[#fd8c00] placeholder-transparent"
+              placeholder=" " /* Placeholder vacío para el efecto de label flotante */
+              pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" /* Expresión regular para validar email */
+              data-error-msg="Por favor, ingresa un correo electrónico válido (ejemplo@dominio.com)" /* Mensaje de error personalizado */
+              class="form-input peer w-full px-4 pt-4 pb-4 border rounded-md
+                     border-gray-300 bg-white focus:outline-none focus:border-[#fd8c00] placeholder-transparent
+                     transition-colors duration-200" /* Clases de Tailwind para estilos */
             />
+            <!-- Label flotante para el campo de email -->
             <label 
               for="email"
-              class="absolute left-4 top-2.5 text-sm text-gray-500 bg-gray-50 px-1 
+              class="absolute left-4 top-1/2 -translate-y-1/2 text-base text-gray-500 bg-white px-1 
                      transition-all duration-200 pointer-events-none 
-                     peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                     peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base 
                      peer-placeholder-shown:text-gray-400 
-                     peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-[#fd8c00]">
-              Ingresa Su Usuario
+                     peer-focus:top-[-0.50rem] peer-focus:-translate-y-0 peer-focus:text-sm peer-focus:text-[#fd8c00]
+                     peer-valid:top-[-0.50rem] peer-valid:-translate-y-0 peer-valid:text-sm" >
+              Correo electrónico
             </label>
+            <!-- Contenedor para mensajes de error -->
+            <div class="error-message mt-1 text-red-500 text-xs hidden"></div>
           </div>
 
-          <!-- Contraseña -->
+          <!-- Campo de contraseña -->
           <div class="relative">
             <input 
               type="password" 
               id="password" 
               required 
-              placeholder="Ingresa tu contraseña"
-              class="peer w-full px-4 pt-6 pb-2 border border-gray-200 rounded-md
-                     bg-gray-50 focus:outline-none focus:border-[#fd8c00] placeholder-transparent"
+              placeholder=" " /* Placeholder vacío para el efecto de label flotante */
+              minlength="8" /* Longitud mínima de 8 caracteres */
+              data-error-msg="La contraseña debe tener al menos 8 caracteres." /* Mensaje de error personalizado */
+              class="form-input peer w-full px-4 pt-4 pb-4 border rounded-md
+                     border-gray-300 bg-white focus:outline-none focus:border-[#fd8c00] placeholder-transparent
+                     transition-colors duration-200" /* Clases de Tailwind para estilos */
             />
+            <!-- Label flotante para el campo de contraseña -->
             <label 
               for="password"
-              class="absolute left-4 top-2.5 text-sm text-gray-500 bg-gray-50 px-1 
+              class="absolute left-4 top-1/2 -translate-y-1/2 text-base text-gray-500 bg-white px-1 
                      transition-all duration-200 pointer-events-none 
-                     peer-placeholder-shown:top-4 peer-placeholder-shown:text-base 
+                     peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:text-base 
                      peer-placeholder-shown:text-gray-400 
-                     peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-[#fd8c00]">
+                     peer-focus:top-[-0.50rem] peer-focus:-translate-y-0 peer-focus:text-sm peer-focus:text-[#fd8c00]
+                     peer-valid:top-[-0.50rem] peer-valid:-translate-y-0 peer-valid:text-sm" >
               Contraseña
             </label>
+            <!-- Contenedor para mensajes de error -->
+            <div class="error-message mt-1 text-red-500 text-xs hidden"></div>
           </div>
 
-          <!-- Botón -->
-          <button type="submit" 
-                  class="w-full bg-red-600 hover:bg-[#fd8c00] text-white 
+          <!-- Botón de inicio de sesión -->
+          <button type="button" /* Inicialmente es type="button" para evitar envíos no deseados */
+                  id="loginButton" /* ID para manipulación con JavaScript */
+                  class="w-full bg-gray-400 text-white /* Color gris por defecto */
+                         opacity-50 cursor-not-allowed /* Estado deshabilitado inicialmente */
                          py-4 px-6 rounded-md font-bebas text-2xl 
-                         transition-all duration-300 transform hover:scale-[1.02]
-                         shadow-lg hover:shadow-xl mt-4">
+                         transition-all duration-300 transform shadow-lg">
             INGRESAR
           </button>
-
         </form>
 
-        <!-- Separador -->
+        <!-- Separador visual "O" -->
         <div class="relative flex items-center py-6">
           <div class="flex-grow border-t border-gray-200"></div>
           <span class="flex-shrink mx-4 font-bebas text-gray-400">O</span>
           <div class="flex-grow border-t border-gray-200"></div>
         </div>
 
-        <!-- Registro -->
+        <!-- Enlace para crear cuenta -->
         <div class="text-center">
           <p class="font-bebas text-xl text-gray-600">¿No tienes cuenta?</p>
           <a href="registro.html" 
@@ -116,18 +154,19 @@
         </div>
       </div>
 
-      <!-- Frase con degradado y subrayado animado -->
+      <!-- Pie de página con lema y selector de idioma -->
       <div class="mt-12 text-center">
+        <!-- Lema con efecto de subrayado animado -->
         <p class="mt-4 text-xl italic font-bold text-transparent bg-clip-text 
         bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 
         relative inline-block group cursor-pointer mx-auto text-center">
         "MOTERO AYUDA MOTERO"
         <span class="absolute left-0 bottom-0 h-[3px] w-0 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-600 
-            transition-all duration-500 ease-out group-hover:w-full">
+              transition-all duration-500 ease-out group-hover:w-full">
         </span>
         </p>
 
-        <!-- Footer inferior -->
+        <!-- Selector de idioma/región -->
         <div class="mt-12 text-center">
           <p class="text-sm text-gray-500">Español - Latinoamérica</p>
         </div>
@@ -135,33 +174,205 @@
     </div>
   </div>
 
-  <!-- Script de validación con alerta emergente -->
-  <script>
-    document.querySelector('form').addEventListener('submit', function(event) {
-      event.preventDefault();
+  <!-- Script JavaScript -->
+    <script>
+    // Espera a que el documento HTML esté completamente cargado antes de ejecutar el código
+    document.addEventListener('DOMContentLoaded', function() {
+        // Selección de elementos del DOM
+        const emailInput = document.getElementById('email'); // Campo de email
+        const passwordInput = document.getElementById('password'); // Campo de contraseña
+        const loginButton = document.getElementById('loginButton'); // Botón de ingreso
+        const form = document.getElementById('loginForm'); // Formulario completo
+        const inputs = document.querySelectorAll('.form-input'); // Todos los inputs del formulario
 
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const alerta = document.getElementById('alerta');
-      const mensaje = document.getElementById('mensaje-alerta');
+        /**
+         * Función para actualizar el estado del botón de ingreso
+         * Habilita el botón solo si ambos campos (email y contraseña) son válidos
+         */
+        function updateLoginButtonState() {
+            // Verifica si el email es válido y no está vacío
+            const isEmailValid = emailInput.checkValidity() && emailInput.value.trim() !== '';
+            // Verifica si la contraseña es válida y no está vacía
+            const isPasswordValid = passwordInput.checkValidity() && passwordInput.value.trim() !== '';
 
-      const validEmail = 'yeferson232@gmail.com';
-      const validPassword = '00000';
-      
+            if (isEmailValid && isPasswordValid) {
+                // Habilita el botón - cambia a color rojo y agrega efectos hover
+                loginButton.classList.remove('bg-gray-400', 'opacity-50', 'cursor-not-allowed');
+                loginButton.classList.add('bg-red-600', 'hover:bg-[#fd8c00]', 'hover:scale-[1.02]', 'hover:shadow-xl');
+                loginButton.type = 'submit'; // Permite el envío del formulario
+                loginButton.disabled = false; // Habilita el botón
+            } else {
+                // Deshabilita el botón - color gris sin efectos
+                loginButton.classList.remove('bg-red-600', 'hover:bg-[#fd8c00]', 'hover:scale-[1.02]', 'hover:shadow-xl');
+                loginButton.classList.add('bg-gray-400', 'opacity-50', 'cursor-not-allowed');
+                loginButton.type = 'button'; // Previene envíos no deseados
+                loginButton.disabled = true; // Deshabilita el botón
+            }
+        }
 
-      if (email === validEmail && password === validPassword) {
-        mensaje.textContent = 'Inicio de sesión exitoso.';
-        alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-green-600';
-      } else {
-        mensaje.textContent = 'Usuario no registrado';
-        alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-red-600';
-      }
+        // Configura la validación para cada input del formulario
+        inputs.forEach(input => {
+            // Obtiene elementos relacionados
+            const parentDiv = input.closest('.relative'); // Contenedor padre
+            const label = parentDiv.querySelector('label'); // Label del input
+            const errorMessageDiv = parentDiv.querySelector('.error-message'); // Div para mensajes de error
+            const originalErrorMsg = input.dataset.errorMsg; // Mensaje de error personalizado
 
-      alerta.classList.remove('hidden');
+            /**
+             * Aplica los estilos de validación según el estado del input
+             * Maneja tres estados: vacío, válido e inválido
+             */
+            function applyValidationStyles() {
+                // Limpia clases de estado previo
+                input.classList.remove('border-red-500', 'border-green-500', 'shake');
+                label.classList.remove('text-red-500', 'text-green-500');
+                errorMessageDiv.classList.add('hidden');
+                errorMessageDiv.textContent = '';
 
-      setTimeout(() => {
-        alerta.classList.add('hidden');
-      }, 3000); // Oculta después de 3 segundos
+                if (input.value.trim() === '') {
+                    // Estado vacío: borde gris y label centrado
+                    input.classList.add('border-gray-300');
+                    label.classList.remove('top-[-0.50rem]', 'text-sm');
+                    label.classList.add('top-1/2', '-translate-y-1/2', 'text-base', 'text-gray-400');
+                } else if (input.checkValidity()) {
+                    // Estado válido: borde verde, label arriba en verde
+                    input.classList.add('border-green-500');
+                    label.classList.add('text-green-500');
+                    // Mantiene label arriba
+                    label.classList.remove('top-1/2', '-translate-y-1/2', 'text-base', 'text-gray-400');
+                    label.classList.add('top-[-0.50rem]', 'text-sm');
+                } else {
+                    // Estado inválido: borde rojo con animación, label arriba en rojo, muestra error
+                    input.classList.add('border-red-500', 'shake');
+                    label.classList.add('text-red-500');
+                    errorMessageDiv.textContent = originalErrorMsg;
+                    errorMessageDiv.classList.remove('hidden');
+                    // Mantiene label arriba
+                    label.classList.remove('top-1/2', '-translate-y-1/2', 'text-base', 'text-gray-400');
+                    label.classList.add('top-[-0.50rem]', 'text-sm');
+                }
+                // Actualiza el estado del botón después de cada cambio
+                updateLoginButtonState();
+            }
+
+            // Evento al escribir en el input
+            input.addEventListener('input', function() {
+                applyValidationStyles();
+                // Durante la escritura, prioriza el borde naranja si el input es válido
+                if (input.checkValidity() && input.value.trim() !== '') {
+                    input.classList.add('border-[#fd8c00]');
+                    label.classList.add('text-[#fd8c00]');
+                }
+            });
+
+            // Evento al recibir foco (hacer clic/tab)
+            input.addEventListener('focus', function() {
+                // Estilo de foco: borde naranja y label arriba en naranja
+                input.classList.remove('border-gray-300', 'border-red-500', 'border-green-500');
+                input.classList.add('border-[#fd8c00]');
+                
+                label.classList.remove('text-gray-500', 'text-red-500', 'text-green-500', 'top-1/2', '-translate-y-1/2', 'text-base', 'text-gray-400');
+                label.classList.add('text-[#fd8c00]', 'top-[-0.50rem]', 'text-sm');
+                
+                errorMessageDiv.classList.add('hidden'); // Oculta errores al enfocar
+                input.classList.remove('shake'); // Detiene animación de error
+            });
+
+            // Evento al perder foco
+            input.addEventListener('blur', function() {
+                // Aplica validación solo si hay contenido o si es inválido
+                if (input.value.trim() !== '' || !input.checkValidity()) {
+                    applyValidationStyles();
+                } else {
+                    // Si está vacío y no es inválido, restaura estado inicial
+                    input.classList.remove('border-red-500', 'border-green-500', 'border-[#fd8c00]');
+                    input.classList.add('border-gray-300');
+                    label.classList.remove('text-red-500', 'text-green-500', 'text-[#fd8c00]', 'top-[-0.50rem]', 'text-sm');
+                    label.classList.add('text-gray-500', 'top-1/2', '-translate-y-1/2', 'text-base');
+                    errorMessageDiv.classList.add('hidden');
+                }
+                updateLoginButtonState();
+            });
+
+            // Validación inicial para campos con autocompletado del navegador
+            if (input.value.trim() !== '') {
+                // Si ya hay valor al cargar, simula interacción previa
+                input.classList.remove('border-gray-300'); // Quita gris por defecto
+                label.classList.remove('top-1/2', '-translate-y-1/2', 'text-base', 'text-gray-400');
+                label.classList.add('top-[-0.50rem]', 'text-sm');
+
+                // Aplica estilos según validación
+                if (input.checkValidity()) {
+                    input.classList.add('border-green-500');
+                    label.classList.add('text-green-500');
+                } else {
+                    input.classList.add('border-red-500');
+                    label.classList.add('text-red-500');
+                    errorMessageDiv.textContent = originalErrorMsg;
+                    errorMessageDiv.classList.remove('hidden');
+                }
+            }
+        });
+
+        // Evento al enviar el formulario
+        form.addEventListener('submit', function(event) {
+            // Previene envío si el botón está deshabilitado
+            if (loginButton.disabled) {
+                event.preventDefault();
+                // Muestra errores en todos los campos inválidos
+                inputs.forEach(input => {
+                    const parentDiv = input.closest('.relative');
+                    const errorMessageDiv = parentDiv.querySelector('.error-message');
+                    const label = parentDiv.querySelector('label');
+
+                    if (!input.checkValidity() || input.value.trim() === '') {
+                        input.classList.add('border-red-500', 'shake');
+                        label.classList.add('text-red-500');
+                        errorMessageDiv.textContent = input.dataset.errorMsg;
+                        errorMessageDiv.classList.remove('hidden');
+                        label.classList.remove('top-1/2', '-translate-y-1/2', 'text-base', 'text-gray-400');
+                        label.classList.add('top-[-0.50rem]', 'text-sm');
+                    }
+                });
+                return; 
+            }
+
+            let formIsValid = true;
+            // Validación final de todos los campos
+            inputs.forEach(input => {
+                if (!input.checkValidity()) {
+                    event.preventDefault();
+                    formIsValid = false;
+                    // Muestra errores en campos inválidos
+                    const parentDiv = input.closest('.relative');
+                    const errorMessageDiv = parentDiv.querySelector('.error-message');
+                    const label = parentDiv.querySelector('label');
+
+                    input.classList.add('border-red-500', 'shake');
+                    label.classList.add('text-red-500');
+                    errorMessageDiv.textContent = input.dataset.errorMsg;
+                    errorMessageDiv.classList.remove('hidden');
+                    label.classList.remove('top-1/2', '-translate-y-1/2', 'text-base', 'text-gray-400');
+                    label.classList.add('top-[-0.50rem]', 'text-sm');
+                }
+            });
+            
+            // Si todo es válido, muestra alerta y redirige
+            if (formIsValid) {
+                const alerta = document.getElementById('alerta');
+                alerta.textContent = 'Iniciando sesión...';
+                alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-green-600';
+                alerta.classList.remove('hidden');
+                
+                // Simula redirección después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            }
+        });
+
+        // Actualiza el estado inicial del botón al cargar la página
+        updateLoginButtonState();
     });
   </script>
 </body>

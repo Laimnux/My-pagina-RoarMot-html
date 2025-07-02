@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Completar Perfil | MYMOTO</title>
+    <!-- Incluye Tailwind CSS desde CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuente personalizada de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        /* Clase para usar la fuente Bebas Neue */
+        .font-bebas { font-family: 'Bebas Neue', sans-serif; }
+        /* Color de fondo personalizado */
+        .bg-cream { background-color: #FBF9F7; }
+        
+        /* Estilos para los inputs cuando tienen focus */
+        .peer:focus {
+            border-color: #fd8c00 !important; /* Color naranja del borde al enfocar */
+        }
+        .peer-focus:text-[#fd8c00] { /* Color del label al enfocar */
+            color: #fd8c00 !important;
+        }
+
+        /* Estilos para inputs válidos e inválidos */
+        .form-input.valid { border-color: #22c55e !important; } /* verde */
+        .form-input.invalid { border-color: #ef4444 !important; } /* rojo */
+
+        /* Estilos para los labels cuando el input es válido/inválido */
+        .form-input.valid ~ label { color: #22c55e !important; }
+        .form-input.invalid ~ label { color: #ef4444 !important; }
+        
+        /* Estilo para los mensajes de error */
+        .error-message { 
+            color: #ef4444; /* rojo */
+            font-size: 0.75rem; /* pequeño */
+            margin-top: 0.25rem; 
+        }
+        
+        /* Animación de shake para inputs inválidos */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake { animation: shake 0.5s; }
+        
+        /* Estilos para la barra de fortaleza de contraseña */
+        #password-strength-bar {
+            height: 6px;
+            width: 100%;
+            background-color: #e2e8f0; /* gris claro */
+            border-radius: 9999px; /* completamente redondeado */
+            overflow: hidden;
+            margin-top: 0.5rem;
+            display: flex; /* los segmentos se alinean en línea */
+        }
+        #password-strength-bar span {
+            flex-grow: 1; /* los segmentos ocupan espacio igual */
+            transition: background-color 0.3s ease-in-out;
+            height: 100%;
+        }
+
+        /* Estilo para el botón cuando está deshabilitado */
+        #submit-btn:disabled {
+            background-color: #a0aec0 !important; /* gris */
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            opacity: 0.7; /* semi-transparente */
+        }
+
+        /* Estilo para el icono de mostrar/ocultar contraseña */
+        .password-toggle-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9ca3af; /* gris */
+            z-index: 10; /* sobre el input */
+        }
+        .password-toggle-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+<body class="bg-cream min-h-screen flex relative">
+
+    <!-- Alerta flotante para mostrar mensajes al usuario -->
+    <div id="alerta" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full">
+        <span id="mensaje-alerta"></span>
+    </div>
+
+    <!-- Contenedor del formulario -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div class="max-w-md w-full">
+            
+            <!-- Logo de la aplicación -->
+            <div class="bg-white p-4 rounded-xl shadow-sm mb-10">
+                <div class="flex items-center justify-center space-x-1">
+                    <img src="./assets/Logo-RoarMot-Negro.png" alt="Logo MYMOTO" class="h-16 w-auto object-contain">
+                    <img src="./assets/tipografia-roarmot-negro.png" alt="Texto MYMOTO" class="h-10 w-auto object-contain">
+                </div>
+            </div>
+
+            <!-- Formulario principal -->
+            <div class="bg-white p-10 rounded-xl shadow-sm">
+                <h1 class="font-bebas text-4xl text-gray-800 text-center mb-2">COMPLETA TU PERFIL</h1>
+                <p class="text-gray-600 text-center mb-8">Último paso para unirte a la comunidad</p>
+                
+                <!-- Formulario con todos los campos -->
+                <form class="mt-8 space-y-6" id="formularioPaso3">
+                    <!-- Campo oculto para el email obtenido de la URL -->
+                    <input type="hidden" id="email" name="email">
+
+                    <div class="space-y-6">
+                        <!-- Grupo de campos nombre y apellido -->
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <!-- Campo nombre -->
+                            <div class="relative flex-1">
+                                <input 
+                                    type="text" 
+                                    id="nombre" 
+                                    name="nombre"
+                                    required 
+                                    maxlength="30"
+                                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                                    data-error-msg="Solo se permiten letras (máx. 30)."
+                                    class="form-input peer w-full px-3 border rounded-md bg-transparent
+                                            border-gray-300 focus:outline-none"
+                                    placeholder=" "
+                                    style="padding-top: 1rem; padding-bottom: 0.85rem;"
+                                />
+                                <!-- Label flotante para el input -->
+                                <label 
+                                    for="nombre"
+                                    class="absolute left-3 bg-white px-1
+                                            transition-all duration-200 pointer-events-none
+                                            text-gray-500
+                                            peer-placeholder-shown:text-base
+                                            peer-placeholder-shown:top-[1.1rem]
+                                            peer-placeholder-shown:-translate-y-0
+                                            peer-focus:top-[-0.5rem] peer-focus:text-xs peer-focus:text-[#fd8c00]" 
+                                >
+                                    Nombre
+                                </label>
+                                <!-- Contenedor para mensaje de error -->
+                                <div class="error-message hidden"></div>
+                            </div>
+
+                            <!-- Campo apellido (similar al nombre) -->
+                            <div class="relative flex-1">
+                                <input 
+                                    type="text" 
+                                    id="apellido" 
+                                    name="apellido"
+                                    required 
+                                    maxlength="30"
+                                    pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                                    data-error-msg="Solo se permiten letras (máx. 30)."
+                                    class="form-input peer w-full px-3 border rounded-md bg-transparent
+                                            border-gray-300 focus:outline-none"
+                                    placeholder=" "
+                                    style="padding-top: 1rem; padding-bottom: 0.85rem;"
+                                >
+                                <label 
+                                    for="apellido"
+                                    class="absolute left-3 bg-white px-1
+                                            transition-all duration-200 pointer-events-none
+                                            text-gray-500
+                                            peer-placeholder-shown:text-base
+                                            peer-placeholder-shown:top-[1.1rem]
+                                            peer-placeholder-shown:-translate-y-0
+                                            peer-focus:top-[-0.5rem] peer-focus:text-xs peer-focus:text-[#fd8c00]" 
+                                >
+                                    Apellido
+                                </label>
+                                <div class="error-message hidden"></div>
+                            </div>
+                        </div>
+
+                        <!-- Campo teléfono -->
+                        <div class="relative">
+                            <input 
+                                type="tel" 
+                                id="telefono" 
+                                name="telefono"
+                                required 
+                                maxlength="10"
+                                pattern="\d{10}"
+                                data-error-msg="Ingresa un teléfono válido (10 dígitos)."
+                                class="form-input peer w-full px-3 border rounded-md bg-transparent
+                                        border-gray-300 focus:outline-none"
+                                placeholder=" "
+                                style="padding-top: 1rem; padding-bottom: 0.85rem;"
+                            >
+                            <label 
+                                for="telefono"
+                                class="absolute left-3 bg-white px-1
+                                        transition-all duration-200 pointer-events-none
+                                        text-gray-500
+                                        peer-placeholder-shown:text-base
+                                        peer-placeholder-shown:top-[1.1rem]
+                                        peer-placeholder-shown:-translate-y-0
+                                        peer-focus:top-[-0.5rem] peer-focus:text-xs peer-focus:text-[#fd8c00]" 
+                            >
+                                Teléfono
+                            </label>
+                            <div class="error-message hidden"></div>
+                        </div>
+
+                        <!-- Campo contraseña con toggle de visibilidad -->
+                        <div class="relative">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password"
+                                required 
+                                minlength="8"
+                                class="form-input peer w-full px-3 border rounded-md bg-transparent
+                                        border-gray-300 focus:outline-none pr-10"
+                                placeholder=" "
+                                style="padding-top: 1rem; padding-bottom: 0.85rem;"
+                            >
+                            <label 
+                                for="password"
+                                class="absolute left-3 bg-white px-1
+                                        transition-all duration-200 pointer-events-none
+                                        text-gray-500
+                                        peer-placeholder-shown:text-base
+                                        peer-placeholder-shown:top-[1.1rem]
+                                        peer-placeholder-shown:-translate-y-0
+                                        peer-focus:top-[-0.5rem] peer-focus:text-xs peer-focus:text-[#fd8c00]" 
+                            >
+                                Contraseña (mínimo 8 caracteres)
+                            </label>
+                            <!-- Icono para mostrar/ocultar contraseña -->
+                            <span class="password-toggle-icon" onclick="togglePasswordVisibility('password')">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path id="password-icon-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path id="password-icon-path2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                            </span>
+                            <div class="error-message hidden"></div>
+                            
+                            <!-- Barra de fortaleza de contraseña -->
+                            <div id="password-strength-bar" class="w-full mt-2 hidden">
+                                <span id="strength-segment-1" class="rounded-l-full"></span>
+                                <span id="strength-segment-2"></span>
+                                <span id="strength-segment-3" class="rounded-r-full"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Checkbox de términos y condiciones -->
+                    <div class="flex items-start mt-4">
+                        <div class="flex items-center h-5">
+                            <input 
+                                id="terminos" 
+                                name="terminos" 
+                                type="checkbox" 
+                                required
+                                class="focus:ring-[#fd8c00] h-4 w-4 text-[#fd8c00] border-gray-300 rounded"
+                            >
+                        </div>
+                        <div class="ml-3 text-sm">
+                            <label for="terminos" class="font-medium text-gray-700">
+                                Acepto los <a href="#" class="text-[#fd8c00] hover:text-[#e67e00]">términos y condiciones</a>
+                            </label>
+                            <div id="terminos-error" class="error-message hidden mt-1">Debes aceptar los términos y condiciones</div>
+                        </div>
+                    </div>
+
+                    <!-- Botón de submit -->
+                    <button 
+                        type="submit" 
+                        id="submit-btn"
+                        disabled
+                        class="w-full bg-gray-400 text-white 
+                               py-4 px-6 rounded-md font-bebas text-2xl 
+                               transition-all duration-300
+                               shadow-lg mt-6"
+                        >
+                        COMPLETAR REGISTRO
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel derecho con imagen (solo visible en pantallas grandes) -->
+    <div class="hidden lg:block w-1/2 relative p-2">
+        <div class="relative w-full h-full rounded-xl overflow-hidden shadow-lg">
+            <!-- Imagen que cambia según el rol del usuario -->
+            <img id="perfil-image" src="./assets/Motero.jpg" alt="Moto MYMOTO" 
+                 class="absolute h-full w-auto max-w-none transition-all duration-300">
+        </div>
+    </div>
+
+<script>
+    // Cuando el DOM está completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- 1. OBTENER DATOS DE LA URL ---
+        // Extrae parámetros de la URL (email y rol)
+        const urlParams = new URLSearchParams(window.location.search);
+        const email = urlParams.get('email');
+        const rol = urlParams.get('rol'); // 'vendedor' o 'comprador'
+        
+        // Asigna el email al campo oculto si existe
+        const emailInput = document.getElementById('email');
+        if (emailInput) {
+            emailInput.value = email || '';
+        }
+
+        // --- 2. CAMBIAR IMAGEN SEGÚN ROL ---
+        const perfilImage = document.getElementById('perfil-image');
+        if (perfilImage) {
+            // Limpiar clases de posicionamiento previas
+            perfilImage.classList.remove('left-[-15%]', 'right-[-40%]');
+
+            if (rol === 'vendedor') {
+                // Configuración para vendedores
+                perfilImage.src = './assets/proveedor.jpg';
+                perfilImage.alt = 'Proveedor MYMOTO';
+                perfilImage.classList.add('right-[-40%]'); // Posicionamiento específico
+            } else { 
+                // Configuración por defecto para compradores
+                perfilImage.src = './assets/Motero.jpg';
+                perfilImage.alt = 'Moto MYMOTO';
+                perfilImage.classList.add('left-[-15%]'); // Posicionamiento específico
+            }
+        }
+
+        // --- 3. OBTENER ELEMENTOS DEL FORMULARIO ---
+        const formulario = document.getElementById('formularioPaso3');
+        const inputsToValidate = document.querySelectorAll('.form-input');
+        const passwordInput = document.getElementById('password');
+        const passwordStrengthBar = document.getElementById('password-strength-bar');
+        const strengthSegments = [
+            document.getElementById('strength-segment-1'),
+            document.getElementById('strength-segment-2'),
+            document.getElementById('strength-segment-3')
+        ];
+        const terminosCheckbox = document.getElementById('terminos');
+        const terminosError = document.getElementById('terminos-error');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // --- 4. FUNCIÓN PARA VERIFICAR VALIDEZ DEL FORMULARIO ---
+        function checkFormValidity() {
+            let formIsValid = true;
+            
+            // Verificar cada input
+            inputsToValidate.forEach(input => {
+                // Validación básica de HTML5 y verificación de no vacío
+                if (!input.checkValidity() || input.value.trim() === '') {
+                    formIsValid = false;
+                }
+                
+                // Validación adicional para contraseña
+                if (input.id === 'password' && input.value.trim() !== '') {
+                    const passwordStrengthValid = checkPasswordStrength(false); // Validar sin mostrar alerta
+                    if (!passwordStrengthValid) {
+                        formIsValid = false;
+                    }
+                }
+            });
+            
+            // Verificar términos aceptados
+            if (!terminosCheckbox.checked) {
+                formIsValid = false;
+            }
+            
+            // Habilitar/deshabilitar botón según validación
+            if (formIsValid) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('bg-gray-400');
+                submitBtn.classList.add('bg-red-600', 'hover:bg-[#fd8c00]', 'hover:scale-[1.02]', 'hover:shadow-xl');
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.classList.remove('bg-red-600', 'hover:bg-[#fd8c00]', 'hover:scale-[1.02]', 'hover:shadow-xl');
+                submitBtn.classList.add('bg-gray-400');
+            }
+        }
+
+        // --- 5. VALIDACIÓN Y ESTILOS PARA INPUTS ---
+        function validateAndStyleInput(input) {
+            const value = input.value.trim();
+            const parentDiv = input.closest('.relative');
+            const errorMessageDiv = parentDiv.querySelector('.error-message');
+            const label = parentDiv.querySelector('label');
+            const originalErrorMsg = input.dataset.errorMsg;
+
+            // Validación básica
+            let isValid = input.checkValidity();
+            let currentErrorMessage = originalErrorMsg;
+
+            // Validación especial para contraseña
+            if (input.id === 'password' && value.length > 0) {
+                const passwordStrengthValid = checkPasswordStrength(false);
+                if (!passwordStrengthValid) {
+                    isValid = false;
+                    currentErrorMessage = errorMessageDiv.textContent; // Usar mensaje de fortaleza
+                }
+            }
+            
+            // Limpiar clases previas
+            input.classList.remove('valid', 'invalid', 'shake', 'border-gray-300', 'border-red-500', 'border-green-500', 'border-[#fd8c00]');
+            label.classList.remove('text-red-500', 'text-green-500', 'text-gray-500', 'text-[#fd8c00]');
+
+            // Lógica de estilos según estado
+            if (value === '') {
+                // Estado vacío
+                input.classList.add('border-gray-300');
+                label.classList.add('text-gray-500');
+                errorMessageDiv.classList.add('hidden');
+                input.setCustomValidity('');
+                if (input.id === 'password') {
+                    passwordStrengthBar.classList.add('hidden');
+                }
+            } else if (isValid) {
+                // Estado válido
+                input.classList.add('valid');
+                label.classList.add('text-green-500');
+                errorMessageDiv.classList.add('hidden');
+                if (input.id === 'password') {
+                    passwordStrengthBar.classList.remove('hidden');
+                }
+            } else {
+                // Estado inválido
+                input.classList.add('invalid', 'shake');
+                label.classList.add('text-red-500');
+                errorMessageDiv.textContent = currentErrorMessage;
+                errorMessageDiv.classList.remove('hidden');
+                if (input.id === 'password') {
+                    passwordStrengthBar.classList.remove('hidden');
+                }
+            }
+            checkFormValidity();
+        }
+
+        // --- 6. VERIFICAR FORTALEZA DE CONTRASEÑA ---
+        function checkPasswordStrength(showAlerts = true) {
+            const password = passwordInput.value;
+            const errorMessageDiv = passwordInput.closest('.relative').querySelector('.error-message');
+            let strength = 0;
+            let missingRequirements = [];
+            let isValidPassword = true;
+
+            // Expresiones regulares para validar requisitos
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumber = /\d/.test(password);
+            const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+            const isMinLength = password.length >= 8;
+
+            // Calcular fortaleza (1 punto por cada requisito cumplido)
+            if (hasUppercase) strength++;
+            else if (showAlerts) missingRequirements.push('una mayúscula');
+            
+            if (hasLowercase) strength++;
+            else if (showAlerts) missingRequirements.push('una minúscula');
+
+            if (hasNumber) strength++;
+            else if (showAlerts) missingRequirements.push('un número');
+
+            if (hasSpecialChar) strength++;
+            else if (showAlerts) missingRequirements.push('un carácter especial');
+
+            // Validar longitud mínima
+            if (!isMinLength) {
+                if (showAlerts) missingRequirements.push('al menos 8 caracteres');
+                isValidPassword = false;
+            }
+
+            // Mostrar mensaje de requisitos faltantes si es necesario
+            if (missingRequirements.length > 0 && showAlerts) {
+                errorMessageDiv.textContent = `La contraseña debe contener: ${missingRequirements.join(', ')}.`;
+                errorMessageDiv.classList.remove('hidden');
+                isValidPassword = false;
+            } else {
+                if (isMinLength) {
+                    errorMessageDiv.classList.add('hidden');
+                }
+            }
+            
+            // Actualizar barra de fortaleza visual
+            strengthSegments.forEach((segment, index) => {
+                segment.classList.remove('bg-red-500', 'bg-orange-400', 'bg-green-500', 'bg-gray-200');
+                if (index < strength) {
+                    if (strength <= 2 && isMinLength) {
+                        segment.classList.add('bg-red-500'); // Débil
+                    } else if ((strength === 3 || strength === 4) && isMinLength) {
+                        segment.classList.add('bg-orange-400'); // Media
+                    } else if (strength === 5 && isMinLength) {
+                        segment.classList.add('bg-green-500'); // Fuerte
+                    } else {
+                        segment.classList.add('bg-gray-200'); // No cumple longitud
+                    }
+                } else {
+                    segment.classList.add('bg-gray-200'); // Segmento no activo
+                }
+            });
+
+            // Validación completa de contraseña
+            const isFullyValid = hasUppercase && hasLowercase && hasNumber && hasSpecialChar && isMinLength;
+            if (isFullyValid) {
+                passwordInput.setCustomValidity(''); // Válido para HTML5
+                return true;
+            } else {
+                passwordInput.setCustomValidity('La contraseña no cumple con los requisitos de fortaleza.');
+                return false;
+            }
+        }
+
+        // --- 7. TOGGLE VISIBILIDAD DE CONTRASEÑA ---
+        function togglePasswordVisibility(id) {
+            const input = document.getElementById(id);
+            const iconPath = document.getElementById(`${id}-icon-path`);
+            const iconPath2 = document.getElementById(`${id}-icon-path2`);
+
+            if (input.type === 'password') {
+                // Cambiar a texto visible
+                input.type = 'text';
+                // Cambiar icono a ojo tachado
+                iconPath.setAttribute('d', 'M13.879 13.879a3 3 0 11-4.242-4.242M10.121 10.121a3 3 0 104.242 4.242');
+                iconPath2.setAttribute('d', 'M1.96 12C2.923 7.953 6.666 5 12 5c4.954 0 8.358 2.943 9.439 7-1.081 4.057-4.485 7-9.439 7-5.334 0-9.077-2.953-10.04-7z');
+            } else {
+                // Cambiar a contraseña oculta
+                input.type = 'password';
+                // Cambiar icono a ojo normal
+                iconPath.setAttribute('d', 'M15 12a3 3 0 11-6 0 3 3 0 016 0z');
+                iconPath2.setAttribute('d', 'M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z');
+            }
+        }
+        // Hacer función accesible globalmente para el onclick
+        window.togglePasswordVisibility = togglePasswordVisibility;
+
+        // --- 8. EVENT LISTENERS PARA INPUTS ---
+        inputsToValidate.forEach(input => {
+            // Validar al escribir
+            input.addEventListener('input', () => {
+                validateAndStyleInput(input);
+                // Mostrar barra de fortaleza para contraseña
+                if (input.id === 'password' && input.value.trim() !== '') {
+                    passwordStrengthBar.classList.remove('hidden');
+                } else if (input.id === 'password' && input.value.trim() === '') {
+                    passwordStrengthBar.classList.add('hidden');
+                }
+            });
+            
+            // Validar al perder foco
+            input.addEventListener('blur', () => {
+                validateAndStyleInput(input);
+            });
+            
+            // Estilos al obtener foco
+            input.addEventListener('focus', () => {
+                // Resetear estilos de validación
+                input.classList.remove('valid', 'invalid', 'border-gray-300', 'border-red-500', 'border-green-500');
+                input.classList.add('border-[#fd8c00]');
+                const label = input.closest('.relative').querySelector('label');
+                label.classList.remove('text-red-500', 'text-green-500', 'text-gray-500');
+                label.classList.add('text-[#fd8c00]');
+                input.closest('.relative').querySelector('.error-message').classList.add('hidden');
+                
+                // Manejo especial para contraseña
+                if (input.id === 'password' && input.value.trim() !== '') {
+                    passwordStrengthBar.classList.remove('hidden');
+                    checkPasswordStrength(true); // Mostrar requisitos al enfocar
+                } else if (input.id === 'password') {
+                    passwordStrengthBar.classList.add('hidden');
+                }
+            });
+        });
+
+        // Validar términos al cambiar el checkbox
+        terminosCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                terminosError.classList.add('hidden');
+            } else {
+                terminosError.classList.remove('hidden');
+            }
+            checkFormValidity();
+        });
+
+        // --- 9. MANEJO DEL ENVÍO DEL FORMULARIO ---
+        formulario.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Forzar validación de todos los campos
+            inputsToValidate.forEach(input => validateAndStyleInput(input));
+            
+            // Validar términos
+            if (!terminosCheckbox.checked) {
+                terminosError.classList.remove('hidden');
+            }
+
+            // Si el formulario no es válido, mostrar alerta
+            if (submitBtn.disabled) {
+                const alerta = document.getElementById('alerta');
+                const mensaje = document.getElementById('mensaje-alerta');
+                mensaje.textContent = 'Por favor, completa todos los campos correctamente y acepta los términos.';
+                alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-red-600';
+                alerta.classList.remove('hidden');
+                setTimeout(() => { alerta.classList.add('hidden'); }, 3000);
+                return;
+            }
+
+            // Cambiar estado del botón a "cargando"
+            const boton = document.querySelector('#formularioPaso3 button[type="submit"]');
+            const textoOriginal = boton.textContent;
+            
+            boton.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Registrando...
+            `;
+            boton.disabled = true;
+
+            // Simular envío al servidor (en producción sería una llamada AJAX real)
+            setTimeout(() => {
+                const alerta = document.getElementById('alerta');
+                const mensaje = document.getElementById('mensaje-alerta');
+                
+                // Mostrar datos en consola (en producción se enviarían al backend)
+                console.log('Datos a enviar:', {
+                    nombre: document.getElementById('nombre').value.trim(),
+                    apellido: document.getElementById('apellido').value.trim(),
+                    telefono: document.getElementById('telefono').value.trim(),
+                    password: document.getElementById('password').value.trim(),
+                    email: email,
+                    rol: rol
+                });
+
+                // Mostrar mensaje de éxito
+                mensaje.textContent = '¡Registro completado! Redirigiendo...';
+                alerta.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-4 rounded-lg shadow-lg text-white font-semibold text-center max-w-md w-full bg-green-600';
+                alerta.classList.remove('hidden');
+
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            }, 1500);
+        });
+
+        // --- 10. INICIALIZACIÓN ---
+        // Verificar estado inicial del formulario
+        checkFormValidity();
+    });
+</script>
+</body>
+</html>
